@@ -1,0 +1,31 @@
+{
+  "name": "Tap Shop Tycoon",
+  "short_name": "Shop Tycoon",
+  "description": "Build your business empire from a small Kirana shop to a Mega Mall.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#eaf6ee",
+  "theme_color": "#1b8a5a",
+  "icons": [
+    {
+      "src": "./assets/icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-maskable.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
