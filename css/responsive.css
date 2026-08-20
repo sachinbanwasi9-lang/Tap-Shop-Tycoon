@@ -1,17 +1,26 @@
 /* ==========================================================
-   responsive.css — Tap Shop Tycoon
-   Mobile + Tablet + Desktop responsive layout
+   TAP SHOP TYCOON — RESPONSIVE CSS
+   STEP 7
+   Mobile + Tablet + Desktop Optimization
    ========================================================== */
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ---------------- MOBILE ---------------- */
 
 @media (max-width: 600px) {
 
   .hud {
+    height: 58px;
     gap: 8px;
     padding: 0 10px;
   }
 
   .hud__stat {
     font-size: 13px;
+    gap: 4px;
   }
 
   .hud__icon {
@@ -25,12 +34,18 @@
   .hud__settings-btn {
     width: 34px;
     height: 34px;
-    font-size: 17px;
+    font-size: 16px;
   }
 
   .screen {
-    padding-left: 10px;
-    padding-right: 10px;
+    padding:
+      14px
+      10px
+      calc(14px + var(--safe-bottom));
+  }
+
+  .main-menu__logo {
+    font-size: 60px;
   }
 
   .main-menu__title {
@@ -41,56 +56,40 @@
     font-size: 13px;
   }
 
+  .btn {
+    min-height: 46px;
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+
   .btn--large {
-    width: 85%;
-    max-width: 300px;
+    min-height: 54px;
+    padding: 15px 36px;
+    font-size: 17px;
   }
 
   .shop-game {
     max-width: 100%;
   }
 
-  .shop-game__header {
-    min-height: 68px;
-  }
-
-  .shop-game__header h2 {
-    font-size: 17px;
-  }
-
-  .shop-game__header p {
-    font-size: 10px;
-  }
-
   .shop-floor {
-    min-height: 410px;
-  }
-
-  .shop-shelves {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .shop-counter {
-    left: 12%;
-    right: 12%;
+    min-height: 400px;
   }
 
   .shop-game__controls {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
   }
 
   .shop-control {
-    min-height: 78px;
+    min-height: 72px;
   }
 
 }
 
 
-/* ==========================================================
-   VERY SMALL PHONES
-   ========================================================== */
+/* ---------------- SMALL PHONES ---------------- */
 
-@media (max-width: 360px) {
+@media (max-width: 380px) {
 
   .hud {
     gap: 5px;
@@ -105,26 +104,21 @@
     font-size: 14px;
   }
 
-  .hud__settings-btn {
-    width: 31px;
-    height: 31px;
-    font-size: 15px;
+  .hud__value--small {
+    display: none;
   }
 
-  .main-menu__logo {
-    font-size: 60px;
+  .hud__settings-btn {
+    width: 32px;
+    height: 32px;
   }
 
   .main-menu__title {
     font-size: 21px;
   }
 
-  .main-menu__subtitle {
-    font-size: 12px;
-  }
-
-  .shop-game {
-    gap: 8px;
+  .main-menu__logo {
+    font-size: 52px;
   }
 
   .shop-game__header {
@@ -136,7 +130,7 @@
   }
 
   .shop-game__header p {
-    font-size: 9px;
+    font-size: 10px;
   }
 
   .shop-floor {
@@ -144,31 +138,13 @@
     border-width: 3px;
   }
 
-  .shop-sign {
-    width: 72%;
-    top: 10px;
-  }
-
-  .shop-sign strong {
-    font-size: 13px;
-  }
-
-  .shop-entrance {
-    left: 8px;
-    top: 95px;
-    width: 58px;
-    height: 90px;
-  }
-
   .shop-shelves {
-    left: 76px;
-    right: 8px;
-    top: 98px;
-    gap: 6px;
+    left: 78px;
+    top: 100px;
   }
 
   .shop-shelf {
-    min-height: 70px;
+    min-height: 72px;
     padding: 5px;
   }
 
@@ -180,33 +156,14 @@
     font-size: 9px;
   }
 
-  .shop-shelf small {
-    font-size: 7px;
-  }
-
-  .shop-customer {
-    right: 10px;
-    bottom: 105px;
-  }
-
-  .shop-customer__avatar {
-    font-size: 35px;
-  }
-
-  .shop-customer__bubble {
-    max-width: 75px;
-    font-size: 8px;
-  }
-
   .shop-counter {
-    left: 8%;
-    right: 8%;
-    bottom: 20px;
-    height: 65px;
+    left: 10%;
+    right: 10%;
+    height: 68px;
   }
 
   .shop-counter__cashier {
-    font-size: 35px;
+    font-size: 36px;
   }
 
   .shop-counter__machine {
@@ -214,35 +171,25 @@
     height: 44px;
   }
 
-  .shop-counter__money {
-    font-size: 16px;
-  }
-
   .shop-control {
-    min-height: 70px;
-    border-radius: 12px;
+    min-height: 68px;
   }
 
   .shop-control__icon {
     font-size: 20px;
   }
 
-  .shop-control strong {
-    font-size: 8px;
-  }
-
-  .shop-control small {
-    font-size: 7px;
-  }
-
 }
 
 
-/* ==========================================================
-   TABLETS
-   ========================================================== */
+/* ---------------- TABLET ---------------- */
 
 @media (min-width: 601px) and (max-width: 1024px) {
+
+  .screen {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
 
   .shop-game {
     max-width: 650px;
@@ -252,88 +199,63 @@
     min-height: 500px;
   }
 
-  .shop-shelves {
-    gap: 12px;
-  }
-
-  .shop-shelf {
-    min-height: 105px;
-  }
-
-  .shop-shelf span {
+  .main-menu__title {
     font-size: 32px;
-  }
-
-  .shop-counter {
-    height: 85px;
   }
 
 }
 
 
-/* ==========================================================
-   DESKTOP
-   ========================================================== */
+/* ---------------- DESKTOP ---------------- */
 
 @media (min-width: 1025px) {
 
   .screen {
-    padding-left: 24px;
-    padding-right: 24px;
+    padding-left: 32px;
+    padding-right: 32px;
   }
 
   .shop-game {
-    max-width: 700px;
+    max-width: 720px;
   }
 
   .shop-floor {
     min-height: 540px;
   }
 
-  .shop-shelf {
-    min-height: 115px;
+  .btn:hover {
+    opacity: 0.9;
   }
 
-  .shop-shelf span {
-    font-size: 34px;
-  }
-
-  .shop-control {
-    min-height: 90px;
+  .shop-control:hover {
+    transform: translateY(-2px);
   }
 
 }
 
 
-/* ==========================================================
-   LANDSCAPE MOBILE
-   ========================================================== */
+/* ---------------- LANDSCAPE PHONES ---------------- */
 
 @media (max-height: 500px) and (orientation: landscape) {
 
   .hud {
-    height: 54px;
+    height: 50px;
+  }
+
+  .screen {
+    padding-top: 10px;
   }
 
   .main-menu {
-    padding: 20px 0;
+    min-height: 430px;
   }
 
   .main-menu__logo {
-    font-size: 45px;
+    font-size: 42px;
   }
 
   .main-menu__title {
-    font-size: 22px;
-  }
-
-  .main-menu__subtitle {
-    margin-bottom: 5px;
-  }
-
-  .btn {
-    margin-top: 6px;
-    padding: 10px 20px;
+    font-size: 21px;
   }
 
   .shop-floor {
@@ -343,56 +265,25 @@
 }
 
 
-/* ==========================================================
-   TOUCH OPTIMIZATION
-   ========================================================== */
+/* ---------------- TOUCH DEVICES ---------------- */
 
-button,
-.shop-control,
-.product-card,
-.shop-shelf {
-  touch-action: manipulation;
-}
+@media (hover: none) and (pointer: coarse) {
 
+  button,
+  .shop-control,
+  .product-card {
+    touch-action: manipulation;
+  }
 
-/* Prevent accidental text selection while playing */
-
-.shop-game,
-.shop-floor,
-.shop-control {
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-
-/* Better tap feedback */
-
-.shop-control:active,
-.btn:active {
-  opacity: 0.85;
-}
-
-
-/* ==========================================================
-   SAFE AREA
-   ========================================================== */
-
-@supports (padding: env(safe-area-inset-bottom)) {
-
-  .screen {
-    padding-bottom:
-      calc(
-        var(--space-lg) +
-        env(safe-area-inset-bottom)
-      );
+  .btn:active,
+  .shop-control:active {
+    transform: scale(0.96);
   }
 
 }
 
 
-/* ==========================================================
-   REDUCE MOTION
-   ========================================================== */
+/* ---------------- REDUCED MOTION ---------------- */
 
 @media (prefers-reduced-motion: reduce) {
 
