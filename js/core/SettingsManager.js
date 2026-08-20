@@ -1,74 +1,459 @@
-/**
- * SettingsManager.js
- * ------------------------------------------------------------
- * Owns user preference state (music/sound/haptics/notifications/
- * graphics quality). Reads its initial state from the save object
- * and emits events whenever something changes so AudioManager,
- * HapticManager, NotificationManager, and UIManager can react
- * without being directly coupled to this class.
- * ------------------------------------------------------------
- */
+/* ==========================================================
+   SettingsManager.js
+   Tap Shop Tycoon
+   ========================================================== */
 
-class SettingsManager {
-  constructor(initialSettings) {
-    const defaults = {
-      musicOn: true,
-      soundOn: true,
-      hapticsOn: true,
-      notificationsOn: true,
-      graphicsQuality: GameConfig.PERFORMANCE.DEFAULT
-    };
-    this.settings = { ...defaults, ...(initialSettings || {}) };
+(function () {
 
-    if (!GameConfig.PERFORMANCE.LEVELS.includes(this.settings.graphicsQuality)) {
-      this.settings.graphicsQuality = GameConfig.PERFORMANCE.DEFAULT;
-    }
-  }
+  "use strict";
 
-  get(key) {
-    return this.settings[key];
-  }
 
-  getAll() {
-    return { ...this.settings };
-  }
+  const DEFAULT_SETTINGS = {
 
-  set(key, value) {
-    if (!(key in this.settings)) {
-      console.warn(`[SettingsManager] Unknown setting "${key}"`);
-      return;
-    }
-    if (key === 'graphicsQuality' && !GameConfig.PERFORMANCE.LEVELS.includes(value)) {
-      console.warn(`[SettingsManager] Invalid graphicsQuality "${value}"`);
-      return;
-    }
-    this.settings[key] = value;
-    EventBus.emit('settings:changed', { key, value, all: this.getAll() });
-    EventBus.emit(`settings:${key}:changed`, value);
-  }
+    music: true,
 
-  toggle(key) {
-    if (typeof this.settings[key] !== 'boolean') return;
-    this.set(key, !this.settings[key]);
-  }
+    sound: true,
 
-  /**
-   * Best-effort auto-detection of a reasonable default graphics
-   * tier based on rough device signals. This never blocks startup —
-   * it just picks a sane starting point the player can override.
-   */
-  autoDetectGraphicsQuality() {
+    haptics: true,
+
+    notifications: true,
+
+    graphicsQuality: "MEDIUM"
+
+  };
+
+
+  let settings = {
+    ...DEFAULT_SETTINGS
+  };
+
+
+  /* ==========================================================
+     LOAD SETTINGS
+     ========================================================== */
+
+  function load() {
+
     try {
-      const cores = navigator.hardwareConcurrency || 2;
-      const mem = navigator.deviceMemory || 2; // GB, not supported on all browsers
-      let tier = 'LOW';
-      if (cores >= 6 && mem >= 4) tier = 'HIGH';
-      else if (cores >= 4 && mem >= 2) tier = 'MEDIUM';
-      this.set('graphicsQuality', tier);
-    } catch (err) {
-      // leave default as-is
-    }
-  }
-}
 
-window.SettingsManager = SettingsManager;
+      const saveData =
+        window.SaveManager
+          ? window.SaveManager.load()
+          : null;
+
+
+      if (
+        saveData &&
+        saveData.settings
+      ) {
+
+        settings = {
+
+          ...DEFAULT_SETTINGS,
+
+          ...saveData.settings
+
+        };
+
+      } else {
+
+        settings = {
+          ...DEFAULT_SETTINGS
+        };
+
+      }
+
+    } catch (error) {
+
+      console.error(
+        "SettingsManager: Load error",
+        error
+      );
+
+      settings = {
+        ...DEFAULT_SETTINGS
+      };
+
+    }
+
+    return getAll();
+
+  }
+
+
+  /* ==========================================================
+     GET ALL SETTINGS
+     ========================================================== */
+
+  function getAll() {
+
+    return {
+      ...settings
+    };
+
+  }
+
+
+  /* ==========================================================
+     GET SETTING
+     ========================================================== */
+
+  function get(key) {
+
+    return settings[key];
+
+  }
+
+
+  /* ==========================================================
+     SET SETTING
+     ========================================================== */
+
+  function set(key, value) {
+
+    if (!(key in DEFAULT_SETTINGS)) {
+
+      console.warn(
+        "SettingsManager: Unknown setting:",
+        key
+      );
+
+      return false;
+
+    }
+
+
+    settings[key] = value;
+
+
+    save();
+
+
+    if (window.EventBus) {
+
+      window.EventBus.emit(
+        "settingsChanged",
+        {
+          key: key,
+          value: value
+        }
+      );
+
+    }
+
+
+    return true;
+
+  }
+
+
+  /* ==========================================================
+     TOGGLE SETTING
+     ========================================================== */
+
+  function toggle(key) {
+
+    if (typeof settings[key] !== "boolean") {
+
+      return false;
+
+    }
+
+
+    return set(
+      key,
+      !settings[key]
+    );
+
+  }
+
+
+  /* ==========================================================
+     SAVE SETTINGS
+     ========================================================== */
+
+  function save() {
+
+    try {
+
+      if (!window.SaveManager) {
+
+        return false;
+
+      }
+
+
+      const saveData =
+        window.SaveManager.load();
+
+
+      saveData.settings = {
+        ...settings
+      };
+
+
+      return window.SaveManager.save(
+        saveData
+      );
+
+    } catch (error) {
+
+      console.error(
+        "SettingsManager: Save error",
+        error
+      );
+
+      return false;
+
+    }
+
+  }
+
+
+  /* ==========================================================
+     RESET SETTINGS
+     ========================================================== */
+
+  function reset() {
+
+    settings = {
+      ...DEFAULT_SETTINGS
+    };
+
+
+    save();
+
+
+    if (window.EventBus) {
+
+      window.EventBus.emit(
+        "settingsChanged",
+        {
+          all: getAll()
+        }
+      );
+
+    }
+
+
+    return getAll();
+
+  }
+
+
+  /* ==========================================================
+     APPLY SETTINGS TO UI
+     ========================================================== */
+
+  function applyToUI() {
+
+    const music =
+      document.getElementById(
+        "setting-music"
+      );
+
+    const sound =
+      document.getElementById(
+        "setting-sound"
+      );
+
+    const haptics =
+      document.getElementById(
+        "setting-haptics"
+      );
+
+    const notifications =
+      document.getElementById(
+        "setting-notifications"
+      );
+
+    const graphics =
+      document.getElementById(
+        "setting-graphics-quality"
+      );
+
+
+    if (music) {
+
+      music.checked =
+        !!settings.music;
+
+    }
+
+
+    if (sound) {
+
+      sound.checked =
+        !!settings.sound;
+
+    }
+
+
+    if (haptics) {
+
+      haptics.checked =
+        !!settings.haptics;
+
+    }
+
+
+    if (notifications) {
+
+      notifications.checked =
+        !!settings.notifications;
+
+    }
+
+
+    if (graphics) {
+
+      graphics.value =
+        settings.graphicsQuality;
+
+    }
+
+  }
+
+
+  /* ==========================================================
+     CONNECT UI
+     ========================================================== */
+
+  function connectUI() {
+
+    const music =
+      document.getElementById(
+        "setting-music"
+      );
+
+    const sound =
+      document.getElementById(
+        "setting-sound"
+      );
+
+    const haptics =
+      document.getElementById(
+        "setting-haptics"
+      );
+
+    const notifications =
+      document.getElementById(
+        "setting-notifications"
+      );
+
+    const graphics =
+      document.getElementById(
+        "setting-graphics-quality"
+      );
+
+
+    if (music) {
+
+      music.addEventListener(
+        "change",
+        function () {
+
+          set(
+            "music",
+            music.checked
+          );
+
+        }
+      );
+
+    }
+
+
+    if (sound) {
+
+      sound.addEventListener(
+        "change",
+        function () {
+
+          set(
+            "sound",
+            sound.checked
+          );
+
+        }
+      );
+
+    }
+
+
+    if (haptics) {
+
+      haptics.addEventListener(
+        "change",
+        function () {
+
+          set(
+            "haptics",
+            haptics.checked
+          );
+
+        }
+      );
+
+    }
+
+
+    if (notifications) {
+
+      notifications.addEventListener(
+        "change",
+        function () {
+
+          set(
+            "notifications",
+            notifications.checked
+          );
+
+        }
+      );
+
+    }
+
+
+    if (graphics) {
+
+      graphics.addEventListener(
+        "change",
+        function () {
+
+          set(
+            "graphicsQuality",
+            graphics.value
+          );
+
+        }
+      );
+
+    }
+
+
+    applyToUI();
+
+  }
+
+
+  /* ==========================================================
+     PUBLIC API
+     ========================================================== */
+
+  window.SettingsManager = {
+
+    load,
+    get,
+    getAll,
+    set,
+    toggle,
+    save,
+    reset,
+    applyToUI,
+    connectUI
+
+  };
+
+
+})();
