@@ -1,217 +1,343 @@
-/**
- * SaveManager.js
- * ------------------------------------------------------------
- * Handles all persistence. Uses localStorage for v1 (synchronous,
- * simple, works everywhere) with an IndexedDB upgrade path left
- * as a clear extension point (see _idbFallback notes below).
- *
- * Responsibilities:
- *  - Load save data safely (never let a corrupt save crash the game)
- *  - Save data with a version stamp
- *  - Migrate old save versions forward
- *  - Provide getDefaultSave() as the canonical "new game" shape
- * ------------------------------------------------------------
- */
+/* ==========================================================
+   SaveManager.js
+   Tap Shop Tycoon
+   LocalStorage Save / Load System
+   ========================================================== */
 
-class SaveManager {
-  constructor() {
-    this.key = GameConfig.SAVE.KEY;
-    this.currentVersion = GameConfig.SAVE.VERSION;
-    this._migrations = {
-      // Example future migration:
-      // 1: (save) => { save.newField = 'default'; save.version = 2; return save; }
+(function () {
+
+  "use strict";
+
+
+  const SAVE_KEY =
+    window.GameConfig?.SAVE_KEY ||
+    "tap_shop_tycoon_save_v1";
+
+
+  /* ==========================================================
+     DEFAULT SAVE
+     ========================================================== */
+
+  function getDefaultSave() {
+
+    const products =
+      window.GameConfig?.PRODUCTS || {};
+
+    const stock = {};
+
+    Object.keys(products).forEach(productId => {
+
+      stock[productId] =
+        products[productId].startingStock || 0;
+
+    });
+
+
+    return {
+
+      version: 1,
+
+      coins:
+        window.GameConfig?.STARTING_COINS || 100,
+
+      premium:
+        window.GameConfig?.STARTING_PREMIUM || 0,
+
+      level:
+        window.GameConfig?.STARTING_LEVEL || 1,
+
+      xp:
+        window.GameConfig?.STARTING_XP || 0,
+
+      stock: stock,
+
+      staff: {
+
+        cashier: 0,
+        manager: 0,
+        delivery: 0
+
+      },
+
+      upgrades: {
+
+        shelf: 0,
+        checkout: 0,
+        marketing: 0,
+        decoration: 0
+
+      },
+
+      shopStage: "kirana",
+
+      settings:
+        JSON.parse(
+          JSON.stringify(
+            window.GameConfig?.DEFAULT_SETTINGS || {
+
+              music: true,
+              sound: true,
+              haptics: true,
+              notifications: true,
+              graphicsQuality: "MEDIUM"
+
+            }
+          )
+        ),
+
+      lastSavedAt: Date.now()
+
     };
+
   }
 
-  getDefaultSave() {
-    return {
-      version: this.currentVersion,
-      createdAt: Date.now(),
-      lastActiveTimestamp: Date.now(),
 
-      economy: {
-        coins: GameConfig.ECONOMY.STARTING_COINS,
-        premium: GameConfig.ECONOMY.STARTING_PREMIUM,
-        xp: GameConfig.ECONOMY.STARTING_XP,
-        level: GameConfig.ECONOMY.STARTING_LEVEL
+  /* ==========================================================
+     SAVE
+     ========================================================== */
+
+  function save(data) {
+
+    try {
+
+      if (!data || typeof data !== "object") {
+        return false;
+      }
+
+      data.lastSavedAt = Date.now();
+
+      localStorage.setItem(
+        SAVE_KEY,
+        JSON.stringify(data)
+      );
+
+      return true;
+
+    } catch (error) {
+
+      console.error(
+        "SaveManager: Unable to save game.",
+        error
+      );
+
+      return false;
+
+    }
+
+  }
+
+
+  /* ==========================================================
+     LOAD
+     ========================================================== */
+
+  function load() {
+
+    try {
+
+      const raw =
+        localStorage.getItem(SAVE_KEY);
+
+      if (!raw) {
+
+        return getDefaultSave();
+
+      }
+
+      const saved =
+        JSON.parse(raw);
+
+      return mergeWithDefaults(saved);
+
+    } catch (error) {
+
+      console.error(
+        "SaveManager: Unable to load save.",
+        error
+      );
+
+      return getDefaultSave();
+
+    }
+
+  }
+
+
+  /* ==========================================================
+     MERGE DEFAULTS
+     ========================================================== */
+
+  function mergeWithDefaults(saved) {
+
+    const defaults =
+      getDefaultSave();
+
+
+    const merged = {
+
+      ...defaults,
+
+      ...saved,
+
+      stock: {
+
+        ...defaults.stock,
+
+        ...(saved.stock || {})
+
       },
 
-      shop: {
-        stageIndex: 0,          // index into GameConfig.SHOP.STAGES
-        currentLocationId: GameConfig.LOCATIONS.STAGES[0].id
+      staff: {
+
+        ...defaults.staff,
+
+        ...(saved.staff || {})
+
       },
 
-      products: {},             // productId -> { stock, price, unlocked }
-      staff: {},                // staffInstanceId -> { role, level }
-      unlockedLocations: [GameConfig.LOCATIONS.STAGES[0].id],
+      upgrades: {
 
-      dailyRewards: {
-        lastClaimDate: null,    // ISO date string
-        streak: 0
-      },
+        ...defaults.upgrades,
 
-      purchases: {
-        removeAds: false
+        ...(saved.upgrades || {})
+
       },
 
       settings: {
-        musicOn: true,
-        soundOn: true,
-        hapticsOn: true,
-        notificationsOn: true,
-        graphicsQuality: GameConfig.PERFORMANCE.DEFAULT
-      },
 
-      tutorial: {
-        completed: false,
-        step: 0
-      },
+        ...defaults.settings,
 
-      flags: {}                 // free-form space for one-off unlock flags
-    };
-  }
+        ...(saved.settings || {})
 
-  /**
-   * Load the save. Returns a valid, migrated save object.
-   * Never throws — falls back to a fresh default save on any problem.
-   */
-  load() {
-    let raw;
-    try {
-      raw = localStorage.getItem(this.key);
-    } catch (err) {
-      console.error('[SaveManager] localStorage unavailable, using in-memory default:', err);
-      return this.getDefaultSave();
-    }
-
-    if (!raw) {
-      return this.getDefaultSave();
-    }
-
-    let parsed;
-    try {
-      parsed = JSON.parse(raw);
-    } catch (err) {
-      console.error('[SaveManager] Save data corrupted (invalid JSON). Starting fresh.', err);
-      this._backupCorruptSave(raw);
-      return this.getDefaultSave();
-    }
-
-    if (!parsed || typeof parsed !== 'object' || typeof parsed.version !== 'number') {
-      console.error('[SaveManager] Save data malformed (missing version). Starting fresh.');
-      this._backupCorruptSave(raw);
-      return this.getDefaultSave();
-    }
-
-    try {
-      parsed = this._migrate(parsed);
-    } catch (err) {
-      console.error('[SaveManager] Migration failed. Starting fresh.', err);
-      this._backupCorruptSave(raw);
-      return this.getDefaultSave();
-    }
-
-    return this._sanitize(parsed);
-  }
-
-  /**
-   * Run any pending migrations to bring an old save up to currentVersion.
-   */
-  _migrate(save) {
-    let migrated = save;
-    while (migrated.version < this.currentVersion) {
-      const step = this._migrations[migrated.version];
-      if (!step) {
-        // No migration path defined — safest option is to keep
-        // whatever fields we recognize and merge onto a fresh default.
-        console.warn(`[SaveManager] No migration from v${migrated.version}, merging onto default.`);
-        migrated = Object.assign(this.getDefaultSave(), migrated, { version: this.currentVersion });
-        break;
       }
-      migrated = step(migrated);
-    }
-    return migrated;
-  }
 
-  /**
-   * Defensive merge: ensures every expected field exists even if the
-   * loaded save is from a partial/older shape, without discarding
-   * player progress.
-   */
-  _sanitize(save) {
-    const def = this.getDefaultSave();
-    const merged = {
-      ...def,
-      ...save,
-      economy: { ...def.economy, ...(save.economy || {}) },
-      shop: { ...def.shop, ...(save.shop || {}) },
-      products: { ...(save.products || {}) },
-      staff: { ...(save.staff || {}) },
-      unlockedLocations: Array.isArray(save.unlockedLocations) && save.unlockedLocations.length
-        ? save.unlockedLocations
-        : def.unlockedLocations,
-      dailyRewards: { ...def.dailyRewards, ...(save.dailyRewards || {}) },
-      purchases: { ...def.purchases, ...(save.purchases || {}) },
-      settings: { ...def.settings, ...(save.settings || {}) },
-      tutorial: { ...def.tutorial, ...(save.tutorial || {}) },
-      flags: { ...(save.flags || {}) }
     };
 
-    // Numeric sanity checks — never allow negative/NaN currency values
-    merged.economy.coins = this._safeNumber(merged.economy.coins, def.economy.coins, 0);
-    merged.economy.premium = this._safeNumber(merged.economy.premium, def.economy.premium, 0);
-    merged.economy.xp = this._safeNumber(merged.economy.xp, def.economy.xp, 0);
-    merged.economy.level = this._safeNumber(merged.economy.level, def.economy.level, 1);
 
     return merged;
+
   }
 
-  _safeNumber(value, fallback, min) {
-    const n = Number(value);
-    if (!Number.isFinite(n) || n < min) return fallback;
-    return n;
-  }
 
-  _backupCorruptSave(raw) {
+  /* ==========================================================
+     RESET
+     ========================================================== */
+
+  function reset() {
+
     try {
-      localStorage.setItem(this.key + '_corrupt_backup_' + Date.now(), raw);
-    } catch (err) {
-      // best effort only
-    }
-  }
 
-  /**
-   * Persist the given save object. Stamps lastActiveTimestamp automatically.
-   */
-  save(saveObject) {
-    try {
-      saveObject.lastActiveTimestamp = Date.now();
-      saveObject.version = this.currentVersion;
-      localStorage.setItem(this.key, JSON.stringify(saveObject));
+      localStorage.removeItem(
+        SAVE_KEY
+      );
+
       return true;
-    } catch (err) {
-      console.error('[SaveManager] Save failed:', err);
-      EventBus.emit('save:error', { error: err });
+
+    } catch (error) {
+
+      console.error(
+        "SaveManager: Unable to reset save.",
+        error
+      );
+
       return false;
+
     }
+
   }
 
-  hasSave() {
+
+  /* ==========================================================
+     HAS SAVE
+     ========================================================== */
+
+  function hasSave() {
+
     try {
-      return localStorage.getItem(this.key) !== null;
-    } catch (err) {
+
+      return (
+        localStorage.getItem(SAVE_KEY) !== null
+      );
+
+    } catch (error) {
+
       return false;
+
     }
+
   }
 
-  wipe() {
+
+  /* ==========================================================
+     EXPORT SAVE
+     ========================================================== */
+
+  function exportSave() {
+
+    const data = load();
+
+    return JSON.stringify(
+      data,
+      null,
+      2
+    );
+
+  }
+
+
+  /* ==========================================================
+     IMPORT SAVE
+     ========================================================== */
+
+  function importSave(json) {
+
     try {
-      localStorage.removeItem(this.key);
-      return true;
-    } catch (err) {
-      return false;
-    }
-  }
-}
 
-window.SaveManager = SaveManager;
+      const data =
+        typeof json === "string"
+          ? JSON.parse(json)
+          : json;
+
+      if (!data || typeof data !== "object") {
+
+        return false;
+
+      }
+
+      const merged =
+        mergeWithDefaults(data);
+
+      return save(merged);
+
+    } catch (error) {
+
+      console.error(
+        "SaveManager: Invalid save data.",
+        error
+      );
+
+      return false;
+
+    }
+
+  }
+
+
+  /* ==========================================================
+     PUBLIC API
+     ========================================================== */
+
+  window.SaveManager = {
+
+    save,
+    load,
+    reset,
+    hasSave,
+    exportSave,
+    importSave,
+    getDefaultSave
+
+  };
+
+
+})();
