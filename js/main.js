@@ -1,47 +1,260 @@
-/**
- * main.js
- * ------------------------------------------------------------
- * Application entry point. Waits for DOM ready, boots GameManager,
- * constructs UIManager, and registers the service worker for PWA
- * support. This file intentionally stays tiny — all real logic
- * lives inside the manager classes.
- * ------------------------------------------------------------
- */
+/* ==========================================================
+   main.js — Tap Shop Tycoon
+   STEP 5 — PLAY button + Shop screen connection
+   ========================================================== */
 
-(function bootstrap() {
-  function start() {
-    try {
-      window.game = new GameManager();
-      window.ui = new UIManager(window.game);
+(() => {
+  "use strict";
 
-      // showScreen('loading') is the default active screen in the HTML;
-      // GameManager.init() will emit 'game:initialized', which UIManager
-      // listens for to switch to the tutorial or main menu.
-      window.game.init();
-    } catch (err) {
-      console.error('[bootstrap] Fatal error during startup:', err);
-      const loadingScreen = document.getElementById('screen-loading');
-      if (loadingScreen) {
-        loadingScreen.innerHTML =
-          '<div class="loading-error">Something went wrong loading Tap Shop Tycoon.<br>' +
-          'Please refresh the app. If this keeps happening, try resetting your data ' +
-          'from Settings.</div>';
-      }
+  const $ = (id) => document.getElementById(id);
+
+  /* -----------------------------
+     Screen Manager
+     ----------------------------- */
+
+  function showScreen(screenId) {
+    document.querySelectorAll(".screen").forEach((screen) => {
+      screen.classList.remove("screen--active");
+    });
+
+    const target = $(screenId);
+
+    if (target) {
+      target.classList.add("screen--active");
     }
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', start);
-  } else {
-    start();
+  /* -----------------------------
+     HUD
+     ----------------------------- */
+
+  function updateHUD() {
+    const coins = $("hud-coins");
+    const premium = $("hud-premium");
+    const level = $("hud-level");
+    const shopStage = $("hud-shop-stage");
+
+    if (coins) coins.textContent = "100";
+    if (premium) premium.textContent = "0";
+    if (level) level.textContent = "1";
+
+    if (shopStage) {
+      shopStage.textContent = "Small Kirana Shop";
+    }
   }
 
-  // PWA: register service worker (non-blocking, best effort)
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js').catch((err) => {
-        console.warn('[bootstrap] Service worker registration failed:', err);
-      });
+  /* -----------------------------
+     Shop Screen
+     ----------------------------- */
+
+  function openShop() {
+    showScreen("screen-shop");
+
+    updateHUD();
+
+    const status = $("shop-status");
+
+    if (status) {
+      status.textContent = "Open • Customers are arriving";
+    }
+
+    updateShopStock();
+
+    showFeedback("🛒", "Your shop is open!");
+  }
+
+  /* -----------------------------
+     Shop Stock
+     ----------------------------- */
+
+  function updateShopStock() {
+    const startingStock = {
+      rice: 10,
+      wheat: 10,
+      milk: 10,
+      bread: 10
+    };
+
+    Object.keys(startingStock).forEach((product) => {
+      const element = document.querySelector(
+        `[data-stock="${product}"]`
+      );
+
+      if (element) {
+        element.textContent = startingStock[product];
+      }
     });
   }
+
+  /* -----------------------------
+     Sale Feedback
+     ----------------------------- */
+
+  function showFeedback(icon, text) {
+    const feedback = $("sale-feedback");
+    const feedbackIcon = $("sale-feedback-icon");
+    const feedbackText = $("sale-feedback-text");
+
+    if (!feedback) return;
+
+    if (feedbackIcon) {
+      feedbackIcon.textContent = icon;
+    }
+
+    if (feedbackText) {
+      feedbackText.textContent = text;
+    }
+
+    feedback.classList.add("sale-feedback--active");
+
+    setTimeout(() => {
+      feedback.classList.remove("sale-feedback--active");
+    }, 2000);
+  }
+
+  /* -----------------------------
+     PLAY Button
+     ----------------------------- */
+
+  function setupPlayButton() {
+    const playButton = $("btn-play");
+
+    if (!playButton) return;
+
+    playButton.addEventListener("click", () => {
+      showScreen("screen-tutorial");
+    });
+  }
+
+  /* -----------------------------
+     Tutorial Continue
+     ----------------------------- */
+
+  function setupTutorialButton() {
+    const button = $("btn-tutorial-continue");
+
+    if (!button) return;
+
+    button.addEventListener("click", () => {
+      openShop();
+    });
+  }
+
+  /* -----------------------------
+     Shop Back Button
+     ----------------------------- */
+
+  function setupShopBackButton() {
+    const button = $("btn-shop-back");
+
+    if (!button) return;
+
+    button.addEventListener("click", () => {
+      showScreen("screen-main-menu");
+    });
+  }
+
+  /* -----------------------------
+     Settings
+     ----------------------------- */
+
+  function setupSettings() {
+    const settingsButton = $("btn-open-settings");
+    const backButton = $("btn-settings-back");
+
+    if (settingsButton) {
+      settingsButton.addEventListener("click", () => {
+        showScreen("screen-settings");
+      });
+    }
+
+    if (backButton) {
+      backButton.addEventListener("click", () => {
+        showScreen("screen-main-menu");
+      });
+    }
+  }
+
+  /* -----------------------------
+     Inventory Button
+     ----------------------------- */
+
+  function setupInventoryButton() {
+    const button = $("btn-open-inventory");
+
+    if (!button) return;
+
+    button.addEventListener("click", () => {
+      showFeedback("📦", "Inventory system is coming next!");
+    });
+  }
+
+  /* -----------------------------
+     Upgrade Button
+     ----------------------------- */
+
+  function setupUpgradeButton() {
+    const button = $("btn-open-upgrades");
+
+    if (!button) return;
+
+    button.addEventListener("click", () => {
+      showFeedback("⬆️", "Shop upgrade system is coming next!");
+    });
+  }
+
+  /* -----------------------------
+     Staff Button
+     ----------------------------- */
+
+  function setupStaffButton() {
+    const button = $("btn-open-staff");
+
+    if (!button) return;
+
+    button.addEventListener("click", () => {
+      showFeedback("👥", "Staff system is coming next!");
+    });
+  }
+
+  /* -----------------------------
+     Loading
+     ----------------------------- */
+
+  function startGame() {
+    updateHUD();
+
+    setTimeout(() => {
+      showScreen("screen-main-menu");
+    }, 1200);
+  }
+
+  /* -----------------------------
+     Initialize
+     ----------------------------- */
+
+  function init() {
+    setupPlayButton();
+    setupTutorialButton();
+    setupShopBackButton();
+
+    setupSettings();
+
+    setupInventoryButton();
+    setupUpgradeButton();
+    setupStaffButton();
+
+    startGame();
+  }
+
+  /* -----------------------------
+     Start
+     ----------------------------- */
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+
 })();
