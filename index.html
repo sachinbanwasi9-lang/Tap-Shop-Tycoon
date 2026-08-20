@@ -14,56 +14,113 @@
 <link rel="stylesheet" href="./css/main.css" />
 <link rel="stylesheet" href="./css/responsive.css" />
 </head>
+
 <body>
 
 <div id="app" class="app">
 
   <!-- ===================== HUD ===================== -->
   <header id="hud" class="hud">
+
     <div class="hud__stat hud__stat--coins">
       <span class="hud__icon" aria-hidden="true">🪙</span>
       <span id="hud-coins" class="hud__value">0</span>
     </div>
+
     <div class="hud__stat hud__stat--premium">
       <span class="hud__icon" aria-hidden="true">💎</span>
       <span id="hud-premium" class="hud__value">0</span>
     </div>
+
     <div class="hud__stat hud__stat--level">
       <span class="hud__icon" aria-hidden="true">⭐</span>
       <span id="hud-level" class="hud__value">1</span>
-      <div class="hud__xp-track"><div id="hud-xp-fill" class="hud__xp-fill"></div></div>
+      <div class="hud__xp-track">
+        <div id="hud-xp-fill" class="hud__xp-fill"></div>
+      </div>
     </div>
+
     <div class="hud__stat hud__stat--shop">
-      <span id="hud-shop-stage" class="hud__value hud__value--small">Small Kirana Shop</span>
+      <span id="hud-shop-stage" class="hud__value hud__value--small">
+        Small Kirana Shop
+      </span>
     </div>
-    <button id="btn-open-settings" class="hud__settings-btn" aria-label="Settings">⚙️</button>
+
+    <button
+      id="btn-open-settings"
+      class="hud__settings-btn"
+      aria-label="Settings">
+      ⚙️
+    </button>
+
   </header>
+
 
   <!-- ===================== SCREENS ===================== -->
   <main id="screens" class="screens">
 
-    <section id="screen-loading" class="screen screen--active" aria-live="polite">
+    <!-- ===================== LOADING ===================== -->
+    <section
+      id="screen-loading"
+      class="screen screen--active"
+      aria-live="polite">
+
       <div class="loading">
         <div class="loading__logo">🏪</div>
-        <h1 class="loading__title">TAP SHOP TYCOON</h1>
+
+        <h1 class="loading__title">
+          TAP SHOP TYCOON
+        </h1>
+
         <div class="loading__spinner"></div>
-        <p class="loading__hint">Opening the shop shutters…</p>
+
+        <p class="loading__hint">
+          Opening the shop shutters…
+        </p>
       </div>
+
     </section>
 
+
+    <!-- ===================== MAIN MENU ===================== -->
     <section id="screen-main-menu" class="screen">
+
       <div class="main-menu">
+
         <div class="main-menu__logo">🏪</div>
-        <h1 class="main-menu__title">TAP SHOP TYCOON</h1>
-        <p class="main-menu__subtitle">From street cart to shopping empire</p>
-        <button id="btn-play" class="btn btn--primary btn--large">PLAY</button>
-        <p class="main-menu__version">v0.1.0 — Foundation Build</p>
+
+        <h1 class="main-menu__title">
+          TAP SHOP TYCOON
+        </h1>
+
+        <p class="main-menu__subtitle">
+          From street cart to shopping empire
+        </p>
+
+        <button
+          id="btn-play"
+          class="btn btn--primary btn--large">
+          PLAY
+        </button>
+
+        <p class="main-menu__version">
+          v0.1.0 — Foundation Build
+        </p>
+
       </div>
+
     </section>
 
+
+    <!-- ===================== TUTORIAL ===================== -->
     <section id="screen-tutorial" class="screen">
+
       <div class="tutorial">
-        <h2 class="tutorial__title">Welcome to your first shop!</h2>
+
+        <h2 class="tutorial__title">
+          Welcome to your first shop!
+        </h2>
+
         <ol class="tutorial__steps">
           <li>A customer walks in.</li>
           <li>They pick a product off your shelf.</li>
@@ -72,71 +129,434 @@
           <li>Spend coins to upgrade your shop and hire staff.</li>
           <li>Expand to new locations as you grow.</li>
         </ol>
-        <p class="tutorial__note">The full interactive tutorial (with a live customer walkthrough) arrives in the next build phase.</p>
-        <button id="btn-tutorial-continue" class="btn btn--primary">Got it — continue</button>
+
+        <p class="tutorial__note">
+          The full interactive tutorial with live customers will be added
+          during the gameplay development phase.
+        </p>
+
+        <button
+          id="btn-tutorial-continue"
+          class="btn btn--primary">
+          Got it — continue
+        </button>
+
       </div>
+
     </section>
 
-    <section id="screen-settings" class="screen">
-      <div class="settings">
-        <h2 class="settings__title">Settings</h2>
 
-        <div class="settings__row">
-          <label for="setting-music">Music</label>
-          <input type="checkbox" id="setting-music" class="toggle" />
-        </div>
-        <div class="settings__row">
-          <label for="setting-sound">Sound Effects</label>
-          <input type="checkbox" id="setting-sound" class="toggle" />
-        </div>
-        <div class="settings__row">
-          <label for="setting-haptics">Haptics</label>
-          <input type="checkbox" id="setting-haptics" class="toggle" />
-        </div>
-        <div class="settings__row">
-          <label for="setting-notifications">Notifications</label>
-          <input type="checkbox" id="setting-notifications" class="toggle" />
-        </div>
-        <div class="settings__row">
-          <label for="setting-graphics-quality">Graphics Quality</label>
-          <select id="setting-graphics-quality">
-            <option value="LOW">Low</option>
-            <option value="MEDIUM">Medium</option>
-            <option value="HIGH">High</option>
-          </select>
+    <!-- ===================== SHOP GAMEPLAY ===================== -->
+    <section id="screen-shop" class="screen">
+
+      <div class="shop-game">
+
+        <!-- SHOP HEADER -->
+        <div class="shop-game__header">
+
+          <div>
+            <h2 id="shop-name">
+              Small Kirana Shop
+            </h2>
+
+            <p id="shop-status">
+              Open • Customers are arriving
+            </p>
+          </div>
+
+          <button
+            id="btn-shop-back"
+            class="btn btn--secondary"
+            type="button">
+            Back
+          </button>
+
         </div>
 
-        <button id="btn-reset-save" class="btn btn--danger">Reset Progress</button>
-        <button id="btn-settings-back" class="btn btn--secondary">Back</button>
+
+        <!-- SHOP FLOOR -->
+        <div id="shop-floor" class="shop-floor">
+
+
+          <!-- CUSTOMER ENTRANCE -->
+          <div class="shop-area shop-area--entrance">
+
+            <div class="shop-area__label">
+              🚪 Entrance
+            </div>
+
+            <div
+              id="customer-spawn"
+              class="customer-spawn">
+            </div>
+
+          </div>
+
+
+          <!-- PRODUCT SHELVES -->
+          <div class="shop-area shop-area--shelves">
+
+            <div class="shop-area__label">
+              📦 Products
+            </div>
+
+            <div
+              id="product-shelves"
+              class="product-shelves">
+
+
+              <!-- RICE -->
+              <div
+                class="product-card"
+                data-product-id="rice">
+
+                <span class="product-card__icon">
+                  🍚
+                </span>
+
+                <strong class="product-card__name">
+                  Rice
+                </strong>
+
+                <span class="product-card__stock">
+                  Stock:
+                  <b data-stock="rice">0</b>
+                </span>
+
+                <span class="product-card__price">
+                  ₹<b data-price="rice">4</b>
+                </span>
+
+              </div>
+
+
+              <!-- WHEAT -->
+              <div
+                class="product-card"
+                data-product-id="wheat">
+
+                <span class="product-card__icon">
+                  🌾
+                </span>
+
+                <strong class="product-card__name">
+                  Wheat
+                </strong>
+
+                <span class="product-card__stock">
+                  Stock:
+                  <b data-stock="wheat">0</b>
+                </span>
+
+                <span class="product-card__price">
+                  ₹<b data-price="wheat">4</b>
+                </span>
+
+              </div>
+
+
+              <!-- MILK -->
+              <div
+                class="product-card"
+                data-product-id="milk">
+
+                <span class="product-card__icon">
+                  🥛
+                </span>
+
+                <strong class="product-card__name">
+                  Milk
+                </strong>
+
+                <span class="product-card__stock">
+                  Stock:
+                  <b data-stock="milk">0</b>
+                </span>
+
+                <span class="product-card__price">
+                  ₹<b data-price="milk">6</b>
+                </span>
+
+              </div>
+
+
+              <!-- BREAD -->
+              <div
+                class="product-card"
+                data-product-id="bread">
+
+                <span class="product-card__icon">
+                  🍞
+                </span>
+
+                <strong class="product-card__name">
+                  Bread
+                </strong>
+
+                <span class="product-card__stock">
+                  Stock:
+                  <b data-stock="bread">0</b>
+                </span>
+
+                <span class="product-card__price">
+                  ₹<b data-price="bread">6</b>
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- CHECKOUT -->
+          <div class="shop-area shop-area--checkout">
+
+            <div class="shop-area__label">
+              🧾 Checkout
+            </div>
+
+            <div
+              id="checkout-counter"
+              class="checkout-counter">
+
+              <span class="checkout-counter__icon">
+                🧾
+              </span>
+
+              <div class="checkout-counter__info">
+
+                <strong>
+                  Checkout Counter
+                </strong>
+
+                <span>
+                  Queue:
+                  <b id="checkout-queue-count">
+                    0
+                  </b>
+                </span>
+
+              </div>
+
+            </div>
+
+            <div
+              id="checkout-queue"
+              class="checkout-queue"
+              aria-live="polite">
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- SALE FEEDBACK -->
+        <div
+          id="sale-feedback"
+          class="sale-feedback"
+          aria-live="polite">
+
+          <span id="sale-feedback-icon">
+            🛒
+          </span>
+
+          <span id="sale-feedback-text">
+            Waiting for customers...
+          </span>
+
+        </div>
+
+
+        <!-- SHOP CONTROLS -->
+        <div class="shop-game__controls">
+
+          <button
+            id="btn-open-inventory"
+            class="btn btn--secondary"
+            type="button">
+            📦 Inventory
+          </button>
+
+          <button
+            id="btn-open-upgrades"
+            class="btn btn--primary"
+            type="button">
+            ⬆️ Upgrade Shop
+          </button>
+
+          <button
+            id="btn-open-staff"
+            class="btn btn--secondary"
+            type="button">
+            👥 Staff
+          </button>
+
+        </div>
+
       </div>
+
+    </section>
+
+
+    <!-- ===================== SETTINGS ===================== -->
+    <section id="screen-settings" class="screen">
+
+      <div class="settings">
+
+        <h2 class="settings__title">
+          Settings
+        </h2>
+
+
+        <div class="settings__row">
+          <label for="setting-music">
+            Music
+          </label>
+
+          <input
+            type="checkbox"
+            id="setting-music"
+            class="toggle" />
+        </div>
+
+
+        <div class="settings__row">
+          <label for="setting-sound">
+            Sound Effects
+          </label>
+
+          <input
+            type="checkbox"
+            id="setting-sound"
+            class="toggle" />
+        </div>
+
+
+        <div class="settings__row">
+          <label for="setting-haptics">
+            Haptics
+          </label>
+
+          <input
+            type="checkbox"
+            id="setting-haptics"
+            class="toggle" />
+        </div>
+
+
+        <div class="settings__row">
+          <label for="setting-notifications">
+            Notifications
+          </label>
+
+          <input
+            type="checkbox"
+            id="setting-notifications"
+            class="toggle" />
+        </div>
+
+
+        <div class="settings__row">
+
+          <label for="setting-graphics-quality">
+            Graphics Quality
+          </label>
+
+          <select id="setting-graphics-quality">
+
+            <option value="LOW">
+              Low
+            </option>
+
+            <option value="MEDIUM">
+              Medium
+            </option>
+
+            <option value="HIGH">
+              High
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <button
+          id="btn-reset-save"
+          class="btn btn--danger">
+          Reset Progress
+        </button>
+
+        <button
+          id="btn-settings-back"
+          class="btn btn--secondary">
+          Back
+        </button>
+
+      </div>
+
     </section>
 
   </main>
 
-  <!-- ===================== MODALS ===================== -->
-  <div id="modal-offline-income" class="modal">
+
+  <!-- ===================== OFFLINE INCOME MODAL ===================== -->
+  <div
+    id="modal-offline-income"
+    class="modal">
+
     <div class="modal__card">
-      <div class="modal__icon">🎉</div>
-      <h2 class="modal__title">WELCOME BACK!</h2>
+
+      <div class="modal__icon">
+        🎉
+      </div>
+
+      <h2 class="modal__title">
+        WELCOME BACK!
+      </h2>
+
       <p class="modal__text">
-        Your shop kept running while you were away for <span data-offline-time>0m</span>.
+        Your shop kept running while you were away for
+        <span data-offline-time>0m</span>.
       </p>
-      <p class="modal__amount">🪙 <span data-offline-amount>0</span></p>
-      <button id="btn-claim-offline" class="btn btn--primary">Collect</button>
+
+      <p class="modal__amount">
+        🪙
+        <span data-offline-amount>0</span>
+      </p>
+
+      <button
+        id="btn-claim-offline"
+        class="btn btn--primary">
+        Collect
+      </button>
+
     </div>
+
   </div>
 
 </div>
 
+
 <!-- ===================== SCRIPTS ===================== -->
-<!-- Load order matters: config/utils first, then core managers, then UI, then bootstrap -->
+
 <script src="./js/config/GameConfig.js"></script>
+
 <script src="./js/utils/EventBus.js"></script>
+
 <script src="./js/core/SaveManager.js"></script>
+
 <script src="./js/core/SettingsManager.js"></script>
+
 <script src="./js/core/EconomyManager.js"></script>
+
 <script src="./js/core/GameManager.js"></script>
+
 <script src="./js/ui/UIManager.js"></script>
+
 <script src="./js/main.js"></script>
+
 </body>
 </html>
