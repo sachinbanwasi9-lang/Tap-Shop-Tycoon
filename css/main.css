@@ -1,648 +1,1114 @@
+:root {
+  --color-bg: #eaf6ee;
+  --color-primary: #1b8a5a;
+  --color-primary-dark: #146b45;
+  --color-accent: #f2b134;
+  --color-accent-dark: #d99a1f;
+  --color-danger: #d64545;
+  --color-text: #1f2b24;
+  --color-text-muted: #5c6b62;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f2f7f3;
+  --color-border: #d7e6dc;
+
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
+  --hud-height: 64px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+
+  background: var(--color-bg);
+  color: var(--color-text);
+  user-select: none;
+}
+
+button,
+select,
+input {
+  font-family: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app {
+  height: 100vh;
+  height: 100dvh;
+
+  display: flex;
+  flex-direction: column;
+
+  padding-top: var(--safe-top);
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+
+  overflow: hidden;
+}
+
+
 /* ==========================================================
-   main.js — Tap Shop Tycoon
-   STEP 6 — Basic Game Flow + Shop Gameplay
+   HUD
    ========================================================== */
 
-(() => {
-  "use strict";
+.hud {
+  flex: 0 0 auto;
 
-  /* ========================================================
-     GAME STATE
-     ======================================================== */
+  height: var(--hud-height);
 
-  const state = {
-    coins: 100,
-    premium: 0,
-    level: 1,
-    xp: 0,
-    xpRequired: 100,
+  display: flex;
+  align-items: center;
 
-    shopStage: "Small Kirana Shop",
+  gap: var(--space-md);
 
-    products: {
-      rice: {
-        name: "Rice",
-        icon: "🍚",
-        stock: 10,
-        price: 4
-      },
+  padding: 0 var(--space-md);
 
-      wheat: {
-        name: "Wheat",
-        icon: "🌾",
-        stock: 10,
-        price: 4
-      },
+  background: var(--color-surface);
 
-      milk: {
-        name: "Milk",
-        icon: "🥛",
-        stock: 10,
-        price: 6
-      },
+  border-bottom: 2px solid var(--color-border);
 
-      bread: {
-        name: "Bread",
-        icon: "🍞",
-        stock: 10,
-        price: 6
-      }
-    },
+  position: relative;
+  z-index: 10;
+}
 
-    customersServed: 0,
-    gameStarted: false
-  };
+.hud__stat {
+  display: flex;
+  align-items: center;
 
+  gap: 6px;
 
-  /* ========================================================
-     DOM HELPERS
-     ======================================================== */
+  font-weight: 700;
+  font-size: 15px;
 
-  const $ = (id) => document.getElementById(id);
+  white-space: nowrap;
+}
 
-  function showScreen(screenId) {
-    document.querySelectorAll(".screen").forEach((screen) => {
-      screen.classList.remove("screen--active");
-    });
+.hud__stat--shop {
+  flex: 1 1 auto;
 
-    const target = $(screenId);
+  overflow: hidden;
 
-    if (target) {
-      target.classList.add("screen--active");
-    }
+  justify-content: flex-end;
+}
+
+.hud__value--small {
+  font-size: 12px;
+
+  font-weight: 600;
+
+  color: var(--color-text-muted);
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+.hud__icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.hud__stat--level {
+  position: relative;
+
+  padding-bottom: 6px;
+}
+
+.hud__xp-track {
+  position: absolute;
+
+  left: 0;
+  bottom: -2px;
+
+  width: 42px;
+  height: 4px;
+
+  background: var(--color-border);
+
+  border-radius: 2px;
+
+  overflow: hidden;
+}
+
+.hud__xp-fill {
+  height: 100%;
+
+  width: 0%;
+
+  background: var(--color-accent);
+
+  transition: width 0.25s ease;
+}
+
+.hud__settings-btn {
+  flex: 0 0 auto;
+
+  width: 36px;
+  height: 36px;
+
+  border-radius: 50%;
+
+  border: none;
+
+  background: var(--color-surface-alt);
+
+  font-size: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+}
+
+.hud-pulse {
+  animation: hudPulse 0.5s ease;
+}
+
+@keyframes hudPulse {
+  0% {
+    transform: scale(1);
+    color: var(--color-text);
   }
 
-
-  /* ========================================================
-     HUD UPDATE
-     ======================================================== */
-
-  function updateHUD() {
-    if ($("hud-coins")) {
-      $("hud-coins").textContent = Math.floor(state.coins);
-    }
-
-    if ($("hud-premium")) {
-      $("hud-premium").textContent = state.premium;
-    }
-
-    if ($("hud-level")) {
-      $("hud-level").textContent = state.level;
-    }
-
-    if ($("hud-shop-stage")) {
-      $("hud-shop-stage").textContent = state.shopStage;
-    }
-
-    if ($("hud-xp-fill")) {
-      const percent =
-        Math.min(100, (state.xp / state.xpRequired) * 100);
-
-      $("hud-xp-fill").style.width = percent + "%";
-    }
+  40% {
+    transform: scale(1.35);
+    color: var(--color-accent-dark);
   }
 
-
-  /* ========================================================
-     XP SYSTEM
-     ======================================================== */
-
-  function addXP(amount) {
-    state.xp += amount;
-
-    while (state.xp >= state.xpRequired) {
-      state.xp -= state.xpRequired;
-      state.level++;
-
-      state.xpRequired = Math.floor(
-        state.xpRequired * 1.25
-      );
-
-      showFeedback(
-        "⭐",
-        "LEVEL UP! You reached Level " + state.level
-      );
-    }
-
-    updateHUD();
-    saveGame();
+  100% {
+    transform: scale(1);
+    color: var(--color-text);
   }
+}
 
 
-  /* ========================================================
-     FEEDBACK
-     ======================================================== */
+/* ==========================================================
+   SCREENS
+   ========================================================== */
 
-  function showFeedback(icon, text) {
-    const iconElement = $("sale-feedback-icon");
-    const textElement = $("sale-feedback-text");
+.screens {
+  flex: 1 1 auto;
 
-    if (iconElement) {
-      iconElement.textContent = icon;
-    }
+  position: relative;
 
-    if (textElement) {
-      textElement.textContent = text;
-    }
+  overflow: hidden;
+}
+
+.screen {
+  position: absolute;
+
+  inset: 0;
+
+  display: none;
+
+  overflow-y: auto;
+
+  padding:
+    var(--space-lg)
+    var(--space-md)
+    calc(var(--space-lg) + var(--safe-bottom));
+}
+
+.screen--active {
+  display: block;
+}
+
+
+/* ==========================================================
+   LOADING
+   ========================================================== */
+
+.loading {
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  gap: var(--space-md);
+}
+
+.loading__logo {
+  font-size: 56px;
+}
+
+.loading__title {
+  font-size: 22px;
+
+  letter-spacing: 1px;
+
+  margin: 0;
+
+  color: var(--color-primary-dark);
+}
+
+.loading__spinner {
+  width: 34px;
+  height: 34px;
+
+  border: 4px solid var(--color-border);
+
+  border-top-color: var(--color-primary);
+
+  border-radius: 50%;
+
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
+}
+
+.loading__hint {
+  color: var(--color-text-muted);
+
+  font-size: 14px;
+}
+
+.loading-error {
+  padding: var(--space-lg);
+
+  text-align: center;
+
+  color: var(--color-danger);
+
+  font-weight: 600;
+}
 
 
-  /* ========================================================
-     PRODUCT UI
-     ======================================================== */
+/* ==========================================================
+   MAIN MENU
+   ========================================================== */
 
-  function updateProductsUI() {
-    Object.keys(state.products).forEach((productId) => {
-      const product = state.products[productId];
+.main-menu {
+  height: 100%;
 
-      const stockElement =
-        document.querySelector(
-          `[data-stock="${productId}"]`
-        );
+  display: flex;
+  flex-direction: column;
 
-      const priceElement =
-        document.querySelector(
-          `[data-price="${productId}"]`
-        );
+  align-items: center;
+  justify-content: center;
 
-      if (stockElement) {
-        stockElement.textContent = product.stock;
-      }
+  text-align: center;
 
-      if (priceElement) {
-        priceElement.textContent = product.price;
-      }
-    });
-  }
+  gap: var(--space-md);
+}
 
+.main-menu__logo {
+  font-size: 72px;
+}
 
-  /* ========================================================
-     CUSTOMER SYSTEM
-     ======================================================== */
+.main-menu__title {
+  font-size: 28px;
 
-  function createCustomer() {
-    const spawn = $("customer-spawn");
+  margin: 0;
 
-    if (!spawn) return;
+  color: var(--color-primary-dark);
 
-    spawn.innerHTML = "";
+  letter-spacing: 1px;
+}
 
-    const customer = document.createElement("div");
+.main-menu__subtitle {
+  margin: 0 0 var(--space-md);
 
-    customer.className = "shop-customer";
+  color: var(--color-text-muted);
+}
 
-    customer.innerHTML = `
-      <div class="shop-customer__bubble">
-        🛒 I want to buy something!
-      </div>
+.main-menu__version {
+  margin-top: var(--space-lg);
 
-      <div class="shop-customer__avatar">
-        🧑
-      </div>
-    `;
+  font-size: 12px;
 
-    spawn.appendChild(customer);
-
-    setTimeout(() => {
-      serveCustomer();
-    }, 1800);
-  }
+  color: var(--color-text-muted);
+}
 
 
-  /* ========================================================
-     SERVE CUSTOMER
-     ======================================================== */
+/* ==========================================================
+   TUTORIAL
+   ========================================================== */
 
-  function serveCustomer() {
-    const availableProducts =
-      Object.keys(state.products).filter(
-        (id) => state.products[id].stock > 0
-      );
+.tutorial {
+  max-width: 480px;
 
-    if (availableProducts.length === 0) {
-      showFeedback(
-        "⚠️",
-        "Out of stock! Buy more inventory."
-      );
+  margin: 0 auto;
+}
 
-      return;
-    }
+.tutorial__title {
+  color: var(--color-primary-dark);
+}
 
-    const randomIndex =
-      Math.floor(
-        Math.random() * availableProducts.length
-      );
+.tutorial__steps {
+  background: var(--color-surface);
 
-    const productId =
-      availableProducts[randomIndex];
+  border-radius: var(--radius-md);
 
-    const product =
-      state.products[productId];
+  padding:
+    var(--space-lg)
+    var(--space-lg)
+    var(--space-lg)
+    40px;
 
-    product.stock--;
+  line-height: 1.9;
 
-    state.coins += product.price;
+  border: 1px solid var(--color-border);
+}
 
-    state.customersServed++;
+.tutorial__note {
+  color: var(--color-text-muted);
 
-    addXP(10);
+  font-size: 13px;
 
-    updateHUD();
-    updateProductsUI();
+  margin:
+    var(--space-md)
+    0
+    var(--space-lg);
+}
 
-    showFeedback(
-      "🪙",
-      `Sale! ${product.icon} ${product.name} +₹${product.price}`
+
+/* ==========================================================
+   SETTINGS
+   ========================================================== */
+
+.settings {
+  max-width: 480px;
+
+  margin: 0 auto;
+}
+
+.settings__title {
+  color: var(--color-primary-dark);
+}
+
+.settings__row {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: var(--space-md) 0;
+
+  border-bottom: 1px solid var(--color-border);
+
+  font-weight: 600;
+}
+
+.settings__row select {
+  padding: 6px 10px;
+
+  border-radius: var(--radius-sm);
+
+  border: 1px solid var(--color-border);
+
+  background: var(--color-surface);
+}
+
+.toggle {
+  width: 44px;
+  height: 26px;
+
+  appearance: none;
+
+  background: var(--color-border);
+
+  border-radius: 999px;
+
+  position: relative;
+
+  cursor: pointer;
+
+  outline: none;
+
+  transition: background 0.2s ease;
+}
+
+.toggle::after {
+  content: "";
+
+  position: absolute;
+
+  top: 3px;
+  left: 3px;
+
+  width: 20px;
+  height: 20px;
+
+  border-radius: 50%;
+
+  background: #fff;
+
+  transition: left 0.2s ease;
+}
+
+.toggle:checked {
+  background: var(--color-primary);
+}
+
+.toggle:checked::after {
+  left: 21px;
+}
+
+
+/* ==========================================================
+   BUTTONS
+   ========================================================== */
+
+.btn {
+  display: inline-block;
+
+  padding: 14px 28px;
+
+  border-radius: var(--radius-md);
+
+  border: none;
+
+  font-size: 16px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  margin-top: var(--space-md);
+
+  transition:
+    transform 0.08s ease,
+    opacity 0.15s ease;
+}
+
+.btn:active {
+  transform: scale(0.96);
+}
+
+.btn--primary {
+  background: var(--color-primary);
+
+  color: #fff;
+}
+
+.btn--secondary {
+  background: var(--color-surface-alt);
+
+  color: var(--color-text);
+
+  border: 1px solid var(--color-border);
+}
+
+.btn--danger {
+  background: #fbe4e4;
+
+  color: var(--color-danger);
+}
+
+.btn--large {
+  padding: 18px 44px;
+
+  font-size: 18px;
+
+  border-radius: var(--radius-lg);
+}
+
+
+/* ==========================================================
+   STEP 5 — SHOP GAMEPLAY
+   ========================================================== */
+
+#screen-shop {
+  background:
+    linear-gradient(
+      180deg,
+      #b8e6c8 0%,
+      #e9f8ee 48%,
+      #c9e8d2 100%
+    );
+}
+
+.shop-game {
+  width: 100%;
+
+  max-width: 520px;
+
+  min-height: 100%;
+
+  margin: 0 auto;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+
+/* SHOP HEADER */
+
+.shop-game__header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding: 14px 16px;
+
+  border-radius: 18px;
+
+  background: rgba(255,255,255,0.96);
+
+  border: 1px solid var(--color-border);
+
+  box-shadow:
+    0 5px 12px rgba(0,0,0,0.10);
+}
+
+.shop-game__header h2 {
+  margin: 3px 0;
+
+  font-size: 18px;
+
+  color: var(--color-primary-dark);
+}
+
+.shop-game__header p {
+  margin: 0;
+
+  font-size: 11px;
+
+  color: var(--color-text-muted);
+}
+
+
+/* ==========================================================
+   SHOP FLOOR
+   ========================================================== */
+
+.shop-floor {
+  position: relative;
+
+  width: 100%;
+
+  min-height: 430px;
+
+  overflow: hidden;
+
+  border-radius: 24px;
+
+  border: 4px solid #82542f;
+
+  background:
+    linear-gradient(
+      180deg,
+      #d9f0db 0%,
+      #eef5d9 52%,
+      #d5a066 53%,
+      #bd7c43 100%
     );
 
-    saveGame();
-
-    const spawn = $("customer-spawn");
-
-    if (spawn) {
-      spawn.innerHTML = "";
-    }
-
-    setTimeout(() => {
-      createCustomer();
-    }, 1200);
-  }
+  box-shadow:
+    inset 0 -8px 0 rgba(0,0,0,0.08),
+    0 8px 18px rgba(0,0,0,0.14);
+}
 
 
-  /* ========================================================
-     GAME START
-     ======================================================== */
+/* ==========================================================
+   ENTRANCE
+   ========================================================== */
 
-  function startGame() {
-    state.gameStarted = true;
+.shop-area--entrance {
+  position: absolute;
 
-    showScreen("screen-shop");
+  left: 12px;
 
-    updateHUD();
-    updateProductsUI();
+  top: 105px;
 
-    showFeedback(
-      "🛒",
-      "Customers are arriving..."
+  width: 68px;
+
+  height: 105px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: #8d6848;
+
+  border: 3px solid #604328;
+
+  box-shadow:
+    inset 0 0 0 5px #b88b61;
+}
+
+.shop-area__label {
+  position: absolute;
+
+  top: -23px;
+
+  left: 0;
+
+  width: 100%;
+
+  font-size: 9px;
+
+  font-weight: 900;
+
+  text-align: center;
+
+  color: var(--color-primary-dark);
+}
+
+.customer-spawn {
+  position: absolute;
+
+  left: 50%;
+
+  bottom: -8px;
+
+  transform: translateX(-50%);
+}
+
+
+/* ==========================================================
+   PRODUCT SHELVES
+   ========================================================== */
+
+.shop-area--shelves {
+  position: absolute;
+
+  top: 108px;
+
+  left: 92px;
+
+  right: 12px;
+}
+
+.product-shelves {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 9px;
+}
+
+.product-card {
+  min-height: 86px;
+
+  padding: 8px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 3px;
+
+  border-radius: 10px;
+
+  background: #9b6032;
+
+  border: 2px solid #70421f;
+
+  border-bottom-width: 6px;
+
+  box-shadow:
+    0 3px 6px rgba(0,0,0,0.18);
+
+  color: #fff;
+}
+
+.product-card__icon {
+  font-size: 27px;
+}
+
+.product-card__name {
+  font-size: 10px;
+}
+
+.product-card__stock {
+  font-size: 8px;
+}
+
+.product-card__price {
+  padding: 2px 7px;
+
+  border-radius: 7px;
+
+  background: #fff;
+
+  color: var(--color-primary-dark);
+
+  font-size: 8px;
+
+  font-weight: 800;
+}
+
+
+/* ==========================================================
+   CUSTOMER
+   ========================================================== */
+
+.shop-customer {
+  position: absolute;
+
+  right: 18px;
+
+  bottom: 116px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  z-index: 4;
+}
+
+.shop-customer__avatar {
+  font-size: 43px;
+
+  filter:
+    drop-shadow(
+      0 4px 2px rgba(0,0,0,0.20)
     );
+}
 
-    setTimeout(() => {
-      createCustomer();
-    }, 1000);
+.shop-customer__bubble {
+  max-width: 90px;
+
+  padding: 7px 9px;
+
+  border-radius: 12px;
+
+  background: #fff;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  box-shadow:
+    0 3px 7px rgba(0,0,0,0.14);
+
+  position: relative;
+}
+
+.shop-customer__bubble::after {
+  content: "";
+
+  position: absolute;
+
+  bottom: 4px;
+
+  left: -5px;
+
+  width: 10px;
+
+  height: 10px;
+
+  background: #fff;
+
+  transform: rotate(45deg);
+}
+
+
+/* ==========================================================
+   CHECKOUT
+   ========================================================== */
+
+.shop-area--checkout {
+  position: absolute;
+
+  left: 15%;
+
+  right: 15%;
+
+  bottom: 27px;
+
+  height: 75px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 8px 14px;
+
+  border-radius: 14px;
+
+  background: #89532d;
+
+  border: 3px solid #603719;
+
+  box-shadow:
+    0 6px 0 #5d351d;
+
+  z-index: 5;
+}
+
+.checkout-counter {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  color: #fff;
+}
+
+.checkout-counter__icon {
+  font-size: 30px;
+}
+
+.checkout-counter__info strong {
+  display: block;
+
+  font-size: 11px;
+}
+
+.checkout-counter__info span {
+  font-size: 9px;
+}
+
+.checkout-queue {
+  display: flex;
+
+  gap: 3px;
+
+  align-items: center;
+}
+
+
+/* ==========================================================
+   SALE FEEDBACK
+   ========================================================== */
+
+.sale-feedback {
+  min-height: 48px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 8px 12px;
+
+  border-radius: 14px;
+
+  background: rgba(255,255,255,0.95);
+
+  border: 1px solid var(--color-border);
+
+  color: var(--color-text-muted);
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  box-shadow:
+    0 3px 8px rgba(0,0,0,0.08);
+}
+
+#sale-feedback-icon {
+  font-size: 20px;
+}
+
+
+/* ==========================================================
+   SHOP CONTROLS
+   ========================================================== */
+
+.shop-game__controls {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 8px;
+}
+
+.shop-game__controls .btn {
+  min-width: 0;
+
+  padding: 12px 6px;
+
+  font-size: 12px;
+
+  margin-top: 0;
+}
+
+
+/* ==========================================================
+   MOBILE SHOP OPTIMIZATION
+   ========================================================== */
+
+@media (max-width: 380px) {
+
+  .shop-game {
+    gap: 9px;
   }
 
-
-  /* ========================================================
-     SAVE GAME
-     ======================================================== */
-
-  function saveGame() {
-    try {
-      localStorage.setItem(
-        "tapShopTycoonSave",
-        JSON.stringify(state)
-      );
-    } catch (error) {
-      console.warn("Save failed:", error);
-    }
+  .shop-game__header {
+    padding: 11px 12px;
   }
 
-
-  /* ========================================================
-     LOAD GAME
-     ======================================================== */
-
-  function loadGame() {
-    try {
-      const saved =
-        localStorage.getItem(
-          "tapShopTycoonSave"
-        );
-
-      if (!saved) return;
-
-      const data = JSON.parse(saved);
-
-      if (typeof data.coins === "number") {
-        state.coins = data.coins;
-      }
-
-      if (typeof data.premium === "number") {
-        state.premium = data.premium;
-      }
-
-      if (typeof data.level === "number") {
-        state.level = data.level;
-      }
-
-      if (typeof data.xp === "number") {
-        state.xp = data.xp;
-      }
-
-      if (typeof data.xpRequired === "number") {
-        state.xpRequired = data.xpRequired;
-      }
-
-      if (typeof data.customersServed === "number") {
-        state.customersServed =
-          data.customersServed;
-      }
-
-      if (data.products) {
-        Object.keys(state.products).forEach(
-          (productId) => {
-            if (data.products[productId]) {
-              state.products[productId].stock =
-                data.products[productId].stock;
-            }
-          }
-        );
-      }
-    } catch (error) {
-      console.warn("Load failed:", error);
-    }
+  .shop-game__header h2 {
+    font-size: 16px;
   }
 
-
-  /* ========================================================
-     INVENTORY
-     ======================================================== */
-
-  function openInventory() {
-    const productNames =
-      Object.values(state.products)
-        .map(
-          (product) =>
-            `${product.icon} ${product.name}: ${product.stock}`
-        )
-        .join("\n");
-
-    alert(
-      "📦 INVENTORY\n\n" +
-      productNames +
-      "\n\nCoins: ₹" +
-      Math.floor(state.coins)
-    );
+  .shop-floor {
+    min-height: 390px;
   }
 
+  .shop-area--shelves {
+    left: 82px;
 
-  /* ========================================================
-     SHOP UPGRADE
-     ======================================================== */
-
-  function upgradeShop() {
-    const upgradeCost =
-      state.level * 100;
-
-    if (state.coins < upgradeCost) {
-      showFeedback(
-        "❌",
-        `Need ₹${upgradeCost} to upgrade.`
-      );
-
-      return;
-    }
-
-    state.coins -= upgradeCost;
-
-    state.shopStage =
-      "Upgraded Kirana Shop";
-
-    addXP(25);
-
-    updateHUD();
-
-    showFeedback(
-      "⬆️",
-      "Shop upgraded successfully!"
-    );
-
-    saveGame();
+    top: 103px;
   }
 
-
-  /* ========================================================
-     STAFF
-     ======================================================== */
-
-  function openStaff() {
-    alert(
-      "👥 STAFF\n\n" +
-      "Staff system is coming soon.\n\n" +
-      "Future staff will automatically:\n" +
-      "• Serve customers\n" +
-      "• Restock products\n" +
-      "• Increase shop income"
-    );
+  .product-card {
+    min-height: 75px;
   }
 
-
-  /* ========================================================
-     SETTINGS
-     ======================================================== */
-
-  function openSettings() {
-    showScreen("screen-settings");
+  .product-card__icon {
+    font-size: 23px;
   }
 
+  .shop-area--checkout {
+    left: 12%;
 
-  function resetGame() {
-    const confirmed =
-      confirm(
-        "Reset all game progress?"
-      );
-
-    if (!confirmed) return;
-
-    localStorage.removeItem(
-      "tapShopTycoonSave"
-    );
-
-    location.reload();
+    right: 12%;
   }
 
+  .shop-game__controls .btn {
+    font-size: 10px;
 
-  /* ========================================================
-     BUTTON EVENTS
-     ======================================================== */
-
-  function setupEvents() {
-
-    /* PLAY */
-
-    $("btn-play")?.addEventListener(
-      "click",
-      () => {
-        showScreen("screen-tutorial");
-      }
-    );
-
-
-    /* TUTORIAL CONTINUE */
-
-    $("btn-tutorial-continue")
-      ?.addEventListener(
-        "click",
-        () => {
-          startGame();
-        }
-      );
-
-
-    /* SETTINGS */
-
-    $("btn-open-settings")
-      ?.addEventListener(
-        "click",
-        () => {
-          openSettings();
-        }
-      );
-
-
-    /* SETTINGS BACK */
-
-    $("btn-settings-back")
-      ?.addEventListener(
-        "click",
-        () => {
-          if (state.gameStarted) {
-            showScreen("screen-shop");
-          } else {
-            showScreen("screen-main-menu");
-          }
-        }
-      );
-
-
-    /* SHOP BACK */
-
-    $("btn-shop-back")
-      ?.addEventListener(
-        "click",
-        () => {
-          showScreen("screen-main-menu");
-        }
-      );
-
-
-    /* INVENTORY */
-
-    $("btn-open-inventory")
-      ?.addEventListener(
-        "click",
-        () => {
-          openInventory();
-        }
-      );
-
-
-    /* UPGRADE */
-
-    $("btn-open-upgrades")
-      ?.addEventListener(
-        "click",
-        () => {
-          upgradeShop();
-        }
-      );
-
-
-    /* STAFF */
-
-    $("btn-open-staff")
-      ?.addEventListener(
-        "click",
-        () => {
-          openStaff();
-        }
-      );
-
-
-    /* RESET */
-
-    $("btn-reset-save")
-      ?.addEventListener(
-        "click",
-        () => {
-          resetGame();
-        }
-      );
-
-
-    /* OFFLINE CLAIM */
-
-    $("btn-claim-offline")
-      ?.addEventListener(
-        "click",
-        () => {
-          const modal =
-            $("modal-offline-income");
-
-          if (modal) {
-            modal.classList.remove(
-              "modal--active"
-            );
-          }
-        }
-      );
+    padding: 10px 4px;
   }
+}
 
 
-  /* ========================================================
-     LOADING
-     ======================================================== */
+/* ==========================================================
+   MODAL
+   ========================================================== */
 
-  function finishLoading() {
+.modal {
+  position: fixed;
 
-    setTimeout(() => {
+  inset: 0;
 
-      showScreen(
-        "screen-main-menu"
-      );
+  display: none;
 
-      updateHUD();
-      updateProductsUI();
+  align-items: center;
 
-    }, 1200);
-  }
+  justify-content: center;
 
+  background: rgba(15,30,22,0.55);
 
-  /* ========================================================
-     INITIALIZE GAME
-     ======================================================== */
+  z-index: 100;
 
-  function init() {
+  padding: var(--space-md);
+}
 
-    loadGame();
+.modal--active {
+  display: flex;
+}
 
-    setupEvents();
+.modal__card {
+  background: var(--color-surface);
 
-    updateHUD();
+  border-radius: var(--radius-lg);
 
-    updateProductsUI();
+  padding:
+    var(--space-xl)
+    var(--space-lg);
 
-    finishLoading();
-  }
+  text-align: center;
 
+  max-width: 340px;
 
-  /* ========================================================
-     START
-     ======================================================== */
+  width: 100%;
+}
 
-  if (
-    document.readyState === "loading"
-  ) {
+.modal__icon {
+  font-size: 44px;
+}
 
-    document.addEventListener(
-      "DOMContentLoaded",
-      init
-    );
+.modal__title {
+  color: var(--color-primary-dark);
 
-  } else {
+  margin:
+    var(--space-sm)
+    0;
 
-    init();
+  letter-spacing: 1px;
+}
 
-  }
+.modal__text {
+  color: var(--color-text-muted);
 
-})();
+  font-size: 14px;
+}
+
+.modal__amount {
+  font-size: 26px;
+
+  font-weight: 800;
+
+  color: var(--color-accent-dark);
+
+  margin: var(--space-md) 0;
+}
