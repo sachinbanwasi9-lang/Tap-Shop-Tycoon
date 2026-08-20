@@ -2,17 +2,43 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no" />
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no"
+/>
+
 <meta name="theme-color" content="#1b8a5a" />
-<meta name="description" content="Tap Shop Tycoon — build your business empire from a small Kirana shop to a Mega Mall." />
+
+<meta
+  name="description"
+  content="Tap Shop Tycoon — build your business empire from a small Kirana shop to a Mega Mall."
+/>
+
 <title>Tap Shop Tycoon</title>
 
 <link rel="manifest" href="./manifest.json" />
-<link rel="icon" href="./assets/icons/icon-192.svg" />
-<link rel="apple-touch-icon" href="./assets/icons/icon-192.svg" />
 
-<link rel="stylesheet" href="./css/main.css" />
-<link rel="stylesheet" href="./css/responsive.css" />
+<link
+  rel="icon"
+  href="./assets/icons/icon-192.svg"
+/>
+
+<link
+  rel="apple-touch-icon"
+  href="./assets/icons/icon-192.svg"
+/>
+
+<link
+  rel="stylesheet"
+  href="./css/main.css"
+/>
+
+<link
+  rel="stylesheet"
+  href="./css/responsive.css"
+/>
+
 </head>
 
 <body>
@@ -20,6 +46,7 @@
 <div id="app" class="app">
 
   <!-- ===================== HUD ===================== -->
+
   <header id="hud" class="hud">
 
     <div class="hud__stat hud__stat--coins">
@@ -33,40 +60,61 @@
     </div>
 
     <div class="hud__stat hud__stat--level">
+
       <span class="hud__icon" aria-hidden="true">⭐</span>
+
       <span id="hud-level" class="hud__value">1</span>
+
       <div class="hud__xp-track">
-        <div id="hud-xp-fill" class="hud__xp-fill"></div>
+        <div
+          id="hud-xp-fill"
+          class="hud__xp-fill">
+        </div>
       </div>
+
     </div>
 
     <div class="hud__stat hud__stat--shop">
-      <span id="hud-shop-stage" class="hud__value hud__value--small">
+
+      <span
+        id="hud-shop-stage"
+        class="hud__value hud__value--small">
+
         Small Kirana Shop
+
       </span>
+
     </div>
 
     <button
       id="btn-open-settings"
       class="hud__settings-btn"
       aria-label="Settings">
+
       ⚙️
+
     </button>
 
   </header>
 
 
   <!-- ===================== SCREENS ===================== -->
+
   <main id="screens" class="screens">
 
+
     <!-- ===================== LOADING ===================== -->
+
     <section
       id="screen-loading"
       class="screen screen--active"
       aria-live="polite">
 
       <div class="loading">
-        <div class="loading__logo">🏪</div>
+
+        <div class="loading__logo">
+          🏪
+        </div>
 
         <h1 class="loading__title">
           TAP SHOP TYCOON
@@ -77,17 +125,23 @@
         <p class="loading__hint">
           Opening the shop shutters…
         </p>
+
       </div>
 
     </section>
 
 
     <!-- ===================== MAIN MENU ===================== -->
-    <section id="screen-main-menu" class="screen">
+
+    <section
+      id="screen-main-menu"
+      class="screen">
 
       <div class="main-menu">
 
-        <div class="main-menu__logo">🏪</div>
+        <div class="main-menu__logo">
+          🏪
+        </div>
 
         <h1 class="main-menu__title">
           TAP SHOP TYCOON
@@ -99,8 +153,11 @@
 
         <button
           id="btn-play"
-          class="btn btn--primary btn--large">
+          class="btn btn--primary btn--large"
+          type="button">
+
           PLAY
+
         </button>
 
         <p class="main-menu__version">
@@ -113,7 +170,10 @@
 
 
     <!-- ===================== TUTORIAL ===================== -->
-    <section id="screen-tutorial" class="screen">
+
+    <section
+      id="screen-tutorial"
+      class="screen">
 
       <div class="tutorial">
 
@@ -122,23 +182,47 @@
         </h2>
 
         <ol class="tutorial__steps">
-          <li>A customer walks in.</li>
-          <li>They pick a product off your shelf.</li>
-          <li>They queue at the checkout.</li>
-          <li>You collect the sale in coins.</li>
-          <li>Spend coins to upgrade your shop and hire staff.</li>
-          <li>Expand to new locations as you grow.</li>
+
+          <li>
+            A customer walks in.
+          </li>
+
+          <li>
+            They pick a product off your shelf.
+          </li>
+
+          <li>
+            They queue at the checkout.
+          </li>
+
+          <li>
+            You collect the sale in coins.
+          </li>
+
+          <li>
+            Spend coins to upgrade your shop and hire staff.
+          </li>
+
+          <li>
+            Expand to new locations as you grow.
+          </li>
+
         </ol>
 
         <p class="tutorial__note">
-          The full interactive tutorial with live customers will be added
-          during the gameplay development phase.
+
+          The full interactive tutorial with live customers
+          will be added during the gameplay development phase.
+
         </p>
 
         <button
           id="btn-tutorial-continue"
-          class="btn btn--primary">
+          class="btn btn--primary"
+          type="button">
+
           Got it — continue
+
         </button>
 
       </div>
@@ -146,44 +230,90 @@
     </section>
 
 
-    <!-- ===================== SHOP GAMEPLAY ===================== -->
-    <section id="screen-shop" class="screen">
+    <!-- =====================================================
+         STEP 5 — SHOP GAMEPLAY
+         ===================================================== -->
+
+    <section
+      id="screen-shop"
+      class="screen">
 
       <div class="shop-game">
 
+
         <!-- SHOP HEADER -->
+
         <div class="shop-game__header">
 
-          <div>
+          <div class="shop-game__title-area">
+
+            <span class="shop-game__label">
+              YOUR BUSINESS
+            </span>
+
             <h2 id="shop-name">
-              Small Kirana Shop
+              🏪 Small Kirana Shop
             </h2>
 
             <p id="shop-status">
               Open • Customers are arriving
             </p>
+
           </div>
 
-          <button
-            id="btn-shop-back"
-            class="btn btn--secondary"
-            type="button">
-            Back
-          </button>
+
+          <div class="shop-game__level">
+
+            <span>
+              LEVEL
+            </span>
+
+            <strong id="shop-level">
+              1
+            </strong>
+
+          </div>
 
         </div>
 
 
         <!-- SHOP FLOOR -->
-        <div id="shop-floor" class="shop-floor">
+
+        <div
+          id="shop-floor"
+          class="shop-floor">
 
 
-          <!-- CUSTOMER ENTRANCE -->
-          <div class="shop-area shop-area--entrance">
+          <!-- SHOP SIGN -->
 
-            <div class="shop-area__label">
-              🚪 Entrance
-            </div>
+          <div class="shop-sign">
+
+            <span class="shop-sign__icon">
+              🏪
+            </span>
+
+            <strong>
+              MY KIRANA
+            </strong>
+
+            <small>
+              Fresh • Fast • Local
+            </small>
+
+          </div>
+
+
+          <!-- ENTRANCE -->
+
+          <div class="shop-entrance">
+
+            <span class="shop-entrance__door">
+              🚪
+            </span>
+
+            <span class="shop-entrance__text">
+              ENTRANCE
+            </span>
 
             <div
               id="customer-spawn"
@@ -194,165 +324,143 @@
 
 
           <!-- PRODUCT SHELVES -->
-          <div class="shop-area shop-area--shelves">
 
-            <div class="shop-area__label">
-              📦 Products
-            </div>
+          <div class="shop-shelves">
+
+
+            <!-- RICE -->
 
             <div
-              id="product-shelves"
-              class="product-shelves">
+              class="shop-shelf"
+              data-product-id="rice">
+
+              <span>🍚</span>
+
+              <strong>
+                Rice
+              </strong>
+
+              <small>
+                ₹4
+              </small>
+
+            </div>
 
 
-              <!-- RICE -->
-              <div
-                class="product-card"
-                data-product-id="rice">
+            <!-- WHEAT -->
 
-                <span class="product-card__icon">
-                  🍚
-                </span>
+            <div
+              class="shop-shelf"
+              data-product-id="wheat">
 
-                <strong class="product-card__name">
-                  Rice
-                </strong>
+              <span>🌾</span>
 
-                <span class="product-card__stock">
-                  Stock:
-                  <b data-stock="rice">0</b>
-                </span>
+              <strong>
+                Wheat
+              </strong>
 
-                <span class="product-card__price">
-                  ₹<b data-price="rice">4</b>
-                </span>
+              <small>
+                ₹4
+              </small>
 
-              </div>
+            </div>
 
 
-              <!-- WHEAT -->
-              <div
-                class="product-card"
-                data-product-id="wheat">
+            <!-- MILK -->
 
-                <span class="product-card__icon">
-                  🌾
-                </span>
+            <div
+              class="shop-shelf"
+              data-product-id="milk">
 
-                <strong class="product-card__name">
-                  Wheat
-                </strong>
+              <span>🥛</span>
 
-                <span class="product-card__stock">
-                  Stock:
-                  <b data-stock="wheat">0</b>
-                </span>
+              <strong>
+                Milk
+              </strong>
 
-                <span class="product-card__price">
-                  ₹<b data-price="wheat">4</b>
-                </span>
+              <small>
+                ₹6
+              </small>
 
-              </div>
+            </div>
 
 
-              <!-- MILK -->
-              <div
-                class="product-card"
-                data-product-id="milk">
+            <!-- BREAD -->
 
-                <span class="product-card__icon">
-                  🥛
-                </span>
+            <div
+              class="shop-shelf"
+              data-product-id="bread">
 
-                <strong class="product-card__name">
-                  Milk
-                </strong>
+              <span>🍞</span>
 
-                <span class="product-card__stock">
-                  Stock:
-                  <b data-stock="milk">0</b>
-                </span>
+              <strong>
+                Bread
+              </strong>
 
-                <span class="product-card__price">
-                  ₹<b data-price="milk">6</b>
-                </span>
-
-              </div>
-
-
-              <!-- BREAD -->
-              <div
-                class="product-card"
-                data-product-id="bread">
-
-                <span class="product-card__icon">
-                  🍞
-                </span>
-
-                <strong class="product-card__name">
-                  Bread
-                </strong>
-
-                <span class="product-card__stock">
-                  Stock:
-                  <b data-stock="bread">0</b>
-                </span>
-
-                <span class="product-card__price">
-                  ₹<b data-price="bread">6</b>
-                </span>
-
-              </div>
+              <small>
+                ₹6
+              </small>
 
             </div>
 
           </div>
 
 
-          <!-- CHECKOUT -->
-          <div class="shop-area shop-area--checkout">
+          <!-- CUSTOMER -->
 
-            <div class="shop-area__label">
-              🧾 Checkout
+          <div
+            id="shop-customer"
+            class="shop-customer">
+
+            <div class="shop-customer__avatar">
+              🧑
             </div>
 
-            <div
-              id="checkout-counter"
-              class="checkout-counter">
+            <div class="shop-customer__bubble">
+              Welcome!
+            </div>
 
-              <span class="checkout-counter__icon">
-                🧾
+          </div>
+
+
+          <!-- CHECKOUT COUNTER -->
+
+          <div class="shop-counter">
+
+            <div class="shop-counter__cashier">
+              👨‍💼
+            </div>
+
+            <div class="shop-counter__machine">
+
+              <span class="shop-counter__money">
+                💰
               </span>
 
-              <div class="checkout-counter__info">
-
-                <strong>
-                  Checkout Counter
-                </strong>
-
-                <span>
-                  Queue:
-                  <b id="checkout-queue-count">
-                    0
-                  </b>
-                </span>
-
-              </div>
+              <span>
+                CHECKOUT
+              </span>
 
             </div>
 
-            <div
-              id="checkout-queue"
-              class="checkout-queue"
-              aria-live="polite">
-            </div>
+          </div>
 
+
+          <!-- FLOOR DETAILS -->
+
+          <div class="shop-floor__plant">
+            🪴
+          </div>
+
+          <div class="shop-floor__box">
+            📦
           </div>
 
         </div>
 
 
         <!-- SALE FEEDBACK -->
+
         <div
           id="sale-feedback"
           class="sale-feedback"
@@ -370,30 +478,82 @@
 
 
         <!-- SHOP CONTROLS -->
+
         <div class="shop-game__controls">
+
 
           <button
             id="btn-open-inventory"
-            class="btn btn--secondary"
+            class="shop-control shop-control--secondary"
             type="button">
-            📦 Inventory
+
+            <span class="shop-control__icon">
+              📦
+            </span>
+
+            <strong>
+              INVENTORY
+            </strong>
+
+            <small>
+              Manage stock
+            </small>
+
           </button>
+
 
           <button
             id="btn-open-upgrades"
-            class="btn btn--primary"
+            class="shop-control shop-control--primary"
             type="button">
-            ⬆️ Upgrade Shop
+
+            <span class="shop-control__icon">
+              ⬆️
+            </span>
+
+            <strong>
+              UPGRADE
+            </strong>
+
+            <small>
+              Improve shop
+            </small>
+
           </button>
+
 
           <button
             id="btn-open-staff"
-            class="btn btn--secondary"
+            class="shop-control shop-control--secondary"
             type="button">
-            👥 Staff
+
+            <span class="shop-control__icon">
+              👥
+            </span>
+
+            <strong>
+              STAFF
+            </strong>
+
+            <small>
+              Hire workers
+            </small>
+
           </button>
 
         </div>
+
+
+        <!-- BACK TO MENU -->
+
+        <button
+          id="btn-shop-back"
+          class="btn btn--secondary shop-back"
+          type="button">
+
+          ← BACK TO MENU
+
+        </button>
 
       </div>
 
@@ -401,7 +561,10 @@
 
 
     <!-- ===================== SETTINGS ===================== -->
-    <section id="screen-settings" class="screen">
+
+    <section
+      id="screen-settings"
+      class="screen">
 
       <div class="settings">
 
@@ -411,6 +574,7 @@
 
 
         <div class="settings__row">
+
           <label for="setting-music">
             Music
           </label>
@@ -419,10 +583,12 @@
             type="checkbox"
             id="setting-music"
             class="toggle" />
+
         </div>
 
 
         <div class="settings__row">
+
           <label for="setting-sound">
             Sound Effects
           </label>
@@ -431,10 +597,12 @@
             type="checkbox"
             id="setting-sound"
             class="toggle" />
+
         </div>
 
 
         <div class="settings__row">
+
           <label for="setting-haptics">
             Haptics
           </label>
@@ -443,10 +611,12 @@
             type="checkbox"
             id="setting-haptics"
             class="toggle" />
+
         </div>
 
 
         <div class="settings__row">
+
           <label for="setting-notifications">
             Notifications
           </label>
@@ -455,6 +625,7 @@
             type="checkbox"
             id="setting-notifications"
             class="toggle" />
+
         </div>
 
 
@@ -485,14 +656,21 @@
 
         <button
           id="btn-reset-save"
-          class="btn btn--danger">
+          class="btn btn--danger"
+          type="button">
+
           Reset Progress
+
         </button>
+
 
         <button
           id="btn-settings-back"
-          class="btn btn--secondary">
+          class="btn btn--secondary"
+          type="button">
+
           Back
+
         </button>
 
       </div>
@@ -503,6 +681,7 @@
 
 
   <!-- ===================== OFFLINE INCOME MODAL ===================== -->
+
   <div
     id="modal-offline-income"
     class="modal">
@@ -518,19 +697,32 @@
       </h2>
 
       <p class="modal__text">
+
         Your shop kept running while you were away for
-        <span data-offline-time>0m</span>.
+
+        <span data-offline-time>
+          0m
+        </span>.
+
       </p>
 
       <p class="modal__amount">
+
         🪙
-        <span data-offline-amount>0</span>
+
+        <span data-offline-amount>
+          0
+        </span>
+
       </p>
 
       <button
         id="btn-claim-offline"
-        class="btn btn--primary">
+        class="btn btn--primary"
+        type="button">
+
         Collect
+
       </button>
 
     </div>
@@ -557,6 +749,63 @@
 <script src="./js/ui/UIManager.js"></script>
 
 <script src="./js/main.js"></script>
+
+
+<!-- =====================================================
+     STEP 5 — PLAY BUTTON CONNECTION
+     Kept here so existing main.js is not overwritten.
+     ===================================================== -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  const playButton =
+    document.getElementById("btn-play");
+
+  const mainMenu =
+    document.getElementById("screen-main-menu");
+
+  const shopScreen =
+    document.getElementById("screen-shop");
+
+  const shopBack =
+    document.getElementById("btn-shop-back");
+
+
+  if (playButton && mainMenu && shopScreen) {
+
+    playButton.addEventListener("click", function () {
+
+      mainMenu.classList.remove("screen--active");
+
+      shopScreen.classList.add("screen--active");
+
+      const hud =
+        document.getElementById("hud");
+
+      if (hud) {
+        hud.style.display = "flex";
+      }
+
+    });
+
+  }
+
+
+  if (shopBack && mainMenu && shopScreen) {
+
+    shopBack.addEventListener("click", function () {
+
+      shopScreen.classList.remove("screen--active");
+
+      mainMenu.classList.add("screen--active");
+
+    });
+
+  }
+
+});
+</script>
 
 </body>
 </html>
